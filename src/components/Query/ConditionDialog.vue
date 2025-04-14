@@ -325,6 +325,13 @@ const queryTypes = [
   { label: '等于', value: 'equal' },
   { label: '日期区间', value: 'dateRange' },
 ]
+// 如果是日期类型，下拉框选项为： 日期小于  日期大于 日期等于  日期大于等于 日期小于等于
+//如果日期为ID类型： 下拉框为：等于 模糊  左模糊  右模糊
+// 如果为数字类型：大于  等于  小于
+// 下拉框可以为  ： 与包含（就是输入框可以同时输入多个值，然后每个值之间用|区分开，然后拼sql的时候，两个模糊查询加& ）
+
+
+
 
 const addCondition = () => {
   conditions.value.push({ field: '字段名', label: '', queryType: '', defaultValue: '' })
