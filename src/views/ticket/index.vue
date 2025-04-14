@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, watch } from 'vue';
 import ConditionDialog from '@/components/Query/ConditionDialog.vue'
 
@@ -60,32 +60,7 @@ const priorityMap = {
 };
 
 // 初始化查询条件
-interface Condition {
-  field: string
-  label: string
-  queryType: string
-  defaultValue: string
-}
-
-// 模拟树形数据
-const treeData = ref([
-  { id: 1, label: '工单查询模板' },
-  { id: 2, label: '我的常用查询' },
-]);
-
-// 定义字段选项
-const fields = ref([
-  { label: '工单编号', value: 'ticketNo' },
-  { label: '标题', value: 'title' },
-  { label: '状态', value: 'status' },
-  { label: '优先级', value: 'priority' },
-  { label: '创建人', value: 'createBy' },
-  { label: '创建时间', value: 'createTime' },
-  { label: '备注', value: 'remark' }
-]);
-
-// 初始化查询条件
-const conditions = ref<Condition[]>([
+const conditions = ref([
   { field: 'ticketNo', label: '工单编号', queryType: 'equal', defaultValue: '' },
   { field: 'title', label: '标题', queryType: 'like', defaultValue: '异常' },
   { field: 'status', label: '状态', queryType: 'equal', defaultValue: '0' }
@@ -142,20 +117,20 @@ const getList = () => {
 };
 
 // 处理查询条件确认
-const handleConfirm = (data: any) => {
+const handleConfirm = (data) => {
   console.log('查询条件：', data);
-  
+
   // 根据条件筛选数据（简单示例）
   if (data && data.conditions && data.conditions.length > 0) {
     tableData.value = originalData.value.filter(item => {
-      return data.conditions.every((condition: Condition) => {
+      return data.conditions.every((condition) => {
         if (!condition.field || !condition.queryType) return true;
-        
+
         const fieldValue = item[condition.field];
         const defaultValue = condition.defaultValue;
-        
+
         if (!defaultValue) return true;
-        
+
         switch (condition.queryType) {
           case 'like':
             return String(fieldValue).includes(defaultValue);

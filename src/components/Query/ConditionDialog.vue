@@ -38,10 +38,10 @@
               </div>
               <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加条件</el-button>
             </div>
-            <el-table 
-              :data="conditions" 
-              border 
-              style="width: 100%" 
+            <el-table
+              :data="conditions"
+              border
+              style="width: 100%"
               @row-click="handleRowClick('condition', $event)"
               highlight-current-row
             >
@@ -90,9 +90,9 @@
               </div>
               <el-button class="mt-2" size="small" type="primary" @click="addColumn">添加栏目</el-button>
             </div>
-            <el-table 
-              :data="columns" 
-              border 
+            <el-table
+              :data="columns"
+              border
               style="width: 100%"
               @row-click="handleRowClick('column', $event)"
               highlight-current-row
@@ -155,9 +155,9 @@
               </div>
               <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加排序</el-button>
             </div>
-            <el-table 
-              :data="sortFields" 
-              border 
+            <el-table
+              :data="sortFields"
+              border
               style="width: 100%"
               @row-click="handleRowClick('sort', $event)"
               highlight-current-row
@@ -215,11 +215,13 @@
   </el-dialog>
 </template>
 
-<script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue'
+<script setup>
+import { ref, watch, computed } from 'vue'
 import { Top, ArrowUp, ArrowDown, Bottom, Delete } from '@element-plus/icons-vue'
 
-const props = defineProps<{ modelValue: boolean }>()
+const props = defineProps({
+  modelValue: Boolean
+})
 const emit = defineEmits(['update:modelValue', 'confirm'])
 
 const dialogVisible = ref(props.modelValue)
@@ -243,30 +245,14 @@ const defaultProps = {
   label: 'label',
 }
 
-const handleTreeClick = (node: any) => {
+const handleTreeClick = (node) => {
   console.log('选择模板:', node)
 }
 
 const activeTab = ref('condition')
 
-interface Condition {
-  field: string
-  label: string
-  queryType: string
-  defaultValue: string
-}
-
-interface Column {
-  field: string
-  label: string
-  width: number
-  fixed: boolean
-  summary: boolean
-  type: string
-}
-
-const conditions = ref<Condition[]>([])
-const columns = ref<Column[]>([])
+const conditions = ref([])
+const columns = ref([])
 
 const queryTypes = [
   { label: '模糊', value: 'like' },
@@ -278,7 +264,7 @@ const addCondition = () => {
   conditions.value.push({ field: '字段名', label: '', queryType: '', defaultValue: '' })
 }
 
-const removeCondition = (index: number) => {
+const removeCondition = (index) => {
   conditions.value.splice(index, 1)
 }
 
@@ -286,7 +272,7 @@ const addColumn = () => {
   columns.value.push({ field: '字段名', label: '', width: 120, fixed: false, summary: false, type: 'string' })
 }
 
-const removeColumn = (index: number) => {
+const removeColumn = (index) => {
   columns.value.splice(index, 1)
 }
 
@@ -306,7 +292,7 @@ const handleCancel = () => {
 }
 
 // 添加排序数据
-const sortFields = ref<Condition[]>([])
+const sortFields = ref([])
 
 // 选中行相关
 const selectedTab = ref('')
@@ -315,7 +301,7 @@ const hasSelectedItem = computed(() => selectedIndex.value >= 0)
 const isFirstItem = computed(() => selectedIndex.value === 0)
 const isLastItem = computed(() => {
   if (selectedIndex.value < 0) return true
-  
+
   const currentData = getCurrentData()
   return selectedIndex.value === currentData.length - 1
 })
@@ -331,7 +317,7 @@ const getCurrentData = () => {
 }
 
 // 处理行点击
-const handleRowClick = (tab: string, row: any, rowIndex?: number) => {
+const handleRowClick = (tab, row, rowIndex) => {
   selectedTab.value = tab
   // 如果rowIndex直接提供了就用它，否则查找索引
   selectedIndex.value = rowIndex !== undefined ? rowIndex : getCurrentData().indexOf(row)
@@ -340,7 +326,7 @@ const handleRowClick = (tab: string, row: any, rowIndex?: number) => {
 // 通用移动方法
 const moveUp = () => {
   if (selectedIndex.value <= 0) return
-  
+
   const data = getCurrentData()
   const temp = data[selectedIndex.value]
   data[selectedIndex.value] = data[selectedIndex.value - 1]
@@ -351,7 +337,7 @@ const moveUp = () => {
 const moveDown = () => {
   const data = getCurrentData()
   if (selectedIndex.value < 0 || selectedIndex.value >= data.length - 1) return
-  
+
   const temp = data[selectedIndex.value]
   data[selectedIndex.value] = data[selectedIndex.value + 1]
   data[selectedIndex.value + 1] = temp
@@ -360,7 +346,7 @@ const moveDown = () => {
 
 const moveToTop = () => {
   if (selectedIndex.value <= 0) return
-  
+
   const data = getCurrentData()
   const item = data.splice(selectedIndex.value, 1)[0]
   data.unshift(item)
@@ -370,7 +356,7 @@ const moveToTop = () => {
 const moveToBottom = () => {
   const data = getCurrentData()
   if (selectedIndex.value < 0 || selectedIndex.value >= data.length - 1) return
-  
+
   const item = data.splice(selectedIndex.value, 1)[0]
   data.push(item)
   selectedIndex.value = data.length - 1
@@ -483,7 +469,7 @@ watch(activeTab, () => {
   .move-buttons {
     display: flex;
     gap: 2px;
-    
+
     :deep(.el-button) {
       padding: 4px;
       margin: 0;
@@ -501,7 +487,7 @@ watch(activeTab, () => {
   display: flex;
   gap: 2px;
   justify-content: center;
-  
+
   :deep(.el-button) {
     padding: 4px;
     margin: 0;
