@@ -21,7 +21,9 @@
           <div class="filter-dialog__right">
         <el-tabs v-model="activeTab" class="filter-dialog__tabs">
           <el-tab-pane label="条件" name="condition">
-            <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加条件</el-button>
+            <div class="tab-actions">
+              <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加条件</el-button>
+            </div>
             <el-table :data="conditions" border style="width: 100%">
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
@@ -51,7 +53,9 @@
           </el-tab-pane>
 
           <el-tab-pane label="栏目" name="column">
-            <el-button class="mt-2" size="small" type="primary" @click="addColumn">添加栏目</el-button>
+            <div class="tab-actions">
+              <el-button class="mt-2" size="small" type="primary" @click="addColumn">添加栏目</el-button>
+            </div>
             <el-table :data="columns" border style="width: 100%">
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
@@ -84,7 +88,9 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane label="排序" name="sort">
-            <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加排序</el-button>
+            <div class="tab-actions">
+              <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加排序</el-button>
+            </div>
             <el-table :data="conditions" border style="width: 100%">
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
@@ -281,13 +287,13 @@ const handleCancel = () => {
     overflow: auto;
 
     :deep(.el-table) {
-      margin-top: 10px;
+      margin-top: 2px;
       border-radius: 4px;
       overflow: hidden;
     }
 
     :deep(.el-button) {
-      margin-bottom: 5px;
+      margin-bottom: 0px;
     }
   }
 
@@ -317,6 +323,17 @@ const handleCancel = () => {
       display: flex;
       gap: 8px;
     }
+  }
+}
+
+.tab-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0px 0; /* 减小上下边距 */
+
+  :deep(.el-button) {
+    padding: 6px 12px; /* 调整按钮内边距使其更小 */
+    font-size: 12px; /* 可选：减小字体大小 */
   }
 }
 </style>
