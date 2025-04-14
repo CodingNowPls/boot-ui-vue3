@@ -66,7 +66,7 @@
               </el-table-column>
               <el-table-column label="操作" width="80">
                 <template #default="{ $index }">
-                  <el-button link type="danger" icon="el-icon-delete" @click="removeCondition($index)" />
+                  <el-button link type="danger" icon="el-icon-delete" @click="removeCondition($index)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -124,7 +124,7 @@
                 <template #default="{ $index }">
                   <div class="operation-buttons">
                     <el-button link type="danger" size="small" @click="removeColumn($index)">
-                      <el-icon><Delete /></el-icon>
+                      删除
                     </el-button>
                   </div>
                 </template>
@@ -173,7 +173,7 @@
               </el-table-column>
               <el-table-column label="操作" width="80">
                 <template #default="{ $index }">
-                  <el-button link type="danger" icon="el-icon-delete" @click="removeSort($index)" />
+                  <el-button link type="danger" icon="el-icon-delete" @click="removeSort($index)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
