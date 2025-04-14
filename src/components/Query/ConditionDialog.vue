@@ -22,9 +22,29 @@
         <el-tabs v-model="activeTab" class="filter-dialog__tabs">
           <el-tab-pane label="条件" name="condition">
             <div class="tab-actions">
+              <div class="move-buttons">
+                <el-button size="small" :disabled="!hasSelectedItem || isFirstItem" @click="moveToTop">
+                  <el-icon><Top /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isFirstItem" @click="moveUp">
+                  <el-icon><ArrowUp /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isLastItem" @click="moveDown">
+                  <el-icon><ArrowDown /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isLastItem" @click="moveToBottom">
+                  <el-icon><Bottom /></el-icon>
+                </el-button>
+              </div>
               <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加条件</el-button>
             </div>
-            <el-table :data="conditions" border style="width: 100%">
+            <el-table 
+              :data="conditions" 
+              border 
+              style="width: 100%" 
+              @row-click="handleRowClick('condition', $event)"
+              highlight-current-row
+            >
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
               <el-table-column label="显示名称">
@@ -54,9 +74,29 @@
 
           <el-tab-pane label="栏目" name="column">
             <div class="tab-actions">
+              <div class="move-buttons">
+                <el-button size="small" :disabled="!hasSelectedItem || isFirstItem" @click="moveToTop">
+                  <el-icon><Top /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isFirstItem" @click="moveUp">
+                  <el-icon><ArrowUp /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isLastItem" @click="moveDown">
+                  <el-icon><ArrowDown /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isLastItem" @click="moveToBottom">
+                  <el-icon><Bottom /></el-icon>
+                </el-button>
+              </div>
               <el-button class="mt-2" size="small" type="primary" @click="addColumn">添加栏目</el-button>
             </div>
-            <el-table :data="columns" border style="width: 100%">
+            <el-table 
+              :data="columns" 
+              border 
+              style="width: 100%"
+              @row-click="handleRowClick('column', $event)"
+              highlight-current-row
+            >
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
               <el-table-column label="显示名称">
@@ -80,18 +120,48 @@
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="80">
+              <el-table-column label="操作" width="180">
                 <template #default="{ $index }">
-                  <el-button link type="danger" icon="Delete" @click="removeColumn($index)" />
+                  <div class="operation-buttons">
+                    <el-button link type="primary" size="small" :disabled="$index === 0" @click="moveColumnToTop($index)">
+                      <el-icon><Top /></el-icon>
+                    </el-button>
+                    <el-button link type="primary" size="small" :disabled="$index === columns.length - 1" @click="moveColumnDown($index)">
+                      <el-icon><ArrowDown /></el-icon>
+                    </el-button>
+                    <el-button link type="danger" size="small" @click="removeColumn($index)">
+                      <el-icon><Delete /></el-icon>
+                    </el-button>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
           <el-tab-pane label="排序" name="sort">
             <div class="tab-actions">
+              <div class="move-buttons">
+                <el-button size="small" :disabled="!hasSelectedItem || isFirstItem" @click="moveToTop">
+                  <el-icon><Top /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isFirstItem" @click="moveUp">
+                  <el-icon><ArrowUp /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isLastItem" @click="moveDown">
+                  <el-icon><ArrowDown /></el-icon>
+                </el-button>
+                <el-button size="small" :disabled="!hasSelectedItem || isLastItem" @click="moveToBottom">
+                  <el-icon><Bottom /></el-icon>
+                </el-button>
+              </div>
               <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加排序</el-button>
             </div>
-            <el-table :data="conditions" border style="width: 100%">
+            <el-table 
+              :data="sortFields" 
+              border 
+              style="width: 100%"
+              @row-click="handleRowClick('sort', $event)"
+              highlight-current-row
+            >
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
               <el-table-column label="显示名称">
@@ -146,7 +216,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
+import { Top, ArrowUp, ArrowDown, Bottom, Delete } from '@element-plus/icons-vue'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits(['update:modelValue', 'confirm'])
@@ -233,6 +304,83 @@ const handleConfirm = () => {
 const handleCancel = () => {
   dialogVisible.value = false
 }
+
+// 添加排序数据
+const sortFields = ref<Condition[]>([])
+
+// 选中行相关
+const selectedTab = ref('')
+const selectedIndex = ref(-1)
+const hasSelectedItem = computed(() => selectedIndex.value >= 0)
+const isFirstItem = computed(() => selectedIndex.value === 0)
+const isLastItem = computed(() => {
+  if (selectedIndex.value < 0) return true
+  
+  const currentData = getCurrentData()
+  return selectedIndex.value === currentData.length - 1
+})
+
+// 获取当前tab的数据
+const getCurrentData = () => {
+  switch (selectedTab.value) {
+    case 'condition': return conditions.value
+    case 'column': return columns.value
+    case 'sort': return sortFields.value
+    default: return []
+  }
+}
+
+// 处理行点击
+const handleRowClick = (tab: string, row: any, rowIndex?: number) => {
+  selectedTab.value = tab
+  // 如果rowIndex直接提供了就用它，否则查找索引
+  selectedIndex.value = rowIndex !== undefined ? rowIndex : getCurrentData().indexOf(row)
+}
+
+// 通用移动方法
+const moveUp = () => {
+  if (selectedIndex.value <= 0) return
+  
+  const data = getCurrentData()
+  const temp = data[selectedIndex.value]
+  data[selectedIndex.value] = data[selectedIndex.value - 1]
+  data[selectedIndex.value - 1] = temp
+  selectedIndex.value--
+}
+
+const moveDown = () => {
+  const data = getCurrentData()
+  if (selectedIndex.value < 0 || selectedIndex.value >= data.length - 1) return
+  
+  const temp = data[selectedIndex.value]
+  data[selectedIndex.value] = data[selectedIndex.value + 1]
+  data[selectedIndex.value + 1] = temp
+  selectedIndex.value++
+}
+
+const moveToTop = () => {
+  if (selectedIndex.value <= 0) return
+  
+  const data = getCurrentData()
+  const item = data.splice(selectedIndex.value, 1)[0]
+  data.unshift(item)
+  selectedIndex.value = 0
+}
+
+const moveToBottom = () => {
+  const data = getCurrentData()
+  if (selectedIndex.value < 0 || selectedIndex.value >= data.length - 1) return
+  
+  const item = data.splice(selectedIndex.value, 1)[0]
+  data.push(item)
+  selectedIndex.value = data.length - 1
+}
+
+// 当切换tab时重置选中状态
+watch(activeTab, () => {
+  selectedTab.value = activeTab.value
+  selectedIndex.value = -1
+})
 </script>
 
 <style scoped lang="scss">
@@ -328,12 +476,35 @@ const handleCancel = () => {
 
 .tab-actions {
   display: flex;
-  justify-content: flex-end;
-  margin: 0px 0; /* 减小上下边距 */
+  justify-content: space-between; /* 改为两端对齐 */
+  align-items: center;
+  margin: 0px 0;
+
+  .move-buttons {
+    display: flex;
+    gap: 2px;
+    
+    :deep(.el-button) {
+      padding: 4px;
+      margin: 0;
+      font-size: 12px;
+    }
+  }
 
   :deep(.el-button) {
-    padding: 6px 12px; /* 调整按钮内边距使其更小 */
-    font-size: 12px; /* 可选：减小字体大小 */
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+.operation-buttons {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  
+  :deep(.el-button) {
+    padding: 4px;
+    margin: 0;
   }
 }
 </style>
