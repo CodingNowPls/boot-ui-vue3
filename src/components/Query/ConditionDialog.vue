@@ -13,8 +13,8 @@
         <!-- 左侧按钮区域 -->
         <div class="filter-dialog__left-buttons">
           <el-button size="small">另存</el-button>
-          <el-button size="small" type="danger">删除</el-button>
           <el-button size="small">新建</el-button>
+          <el-button size="small" type="danger">删除</el-button>
         </div>
       </div>
 
