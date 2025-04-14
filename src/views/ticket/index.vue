@@ -3,7 +3,7 @@
     <el-card>
       <template #header>
         <div class="flex justify-between items-center">
-          <el-button type="primary" icon="Setting" @click="dialogVisible = true">设置</el-button>
+          <el-button type="primary" icon="Setting" @click="handleOpenDialog">设置</el-button>
         </div>
       </template>
 
@@ -31,7 +31,10 @@
     <!-- 条件设置对话框 -->
     <ConditionDialog
         v-model="dialogVisible"
-        :fieldOptions="fields"
+        :conditionsData="conditions"
+        :columnsData="columns"
+        :sortData="sortFields"
+        :templateData="templates"
         @confirm="handleConfirm"
     />
   </div>
@@ -68,6 +71,64 @@ const conditions = ref([
 
 // 初始条件设置
 const initialConditions = ref(conditions.value);
+
+// 添加列和排序数据
+const columns = ref([
+  { field: 'ticketNo', label: '工单编号', width: 150, fixed: false, summary: false, type: 'string' },
+  { field: 'title', label: '标题', width: 200, fixed: false, summary: false, type: 'string' },
+  { field: 'status', label: '状态', width: 100, fixed: false, summary: false, type: 'string' },
+  { field: 'priority', label: '优先级', width: 100, fixed: false, summary: false, type: 'string' }
+]);
+
+const sortFields = ref([
+  { field: 'createTime', label: '创建时间', queryType: 'desc', defaultValue: '' }
+]);
+
+const templates = ref([
+  { id: 1, label: '默认模板' },
+  { id: 2, label: '自定义模板' }
+]);
+
+// 修改打开对话框的方法
+const handleOpenDialog = () => {
+  // 先刷新数据
+  getList();
+  
+  // 更新条件、列和排序数据
+  updateDialogData();
+  
+  // 然后打开对话框
+  dialogVisible.value = true;
+}
+
+// 添加更新对话框数据的方法
+const updateDialogData = () => {
+  // 这里可以从后端获取最新的条件、列和排序数据
+  // 或者根据当前表格状态更新
+  
+  // 示例：更新条件数据
+  conditions.value = [
+    { field: 'ticketNo', label: '工单编号', queryType: 'equal', defaultValue: '' },
+    { field: 'title', label: '标题', queryType: 'like', defaultValue: '' },
+    { field: 'status', label: '状态', queryType: 'equal', defaultValue: '' },
+    { field: 'priority', label: '优先级', queryType: 'equal', defaultValue: '' }
+  ];
+  
+  // 示例：更新列数据
+  columns.value = [
+    { field: 'ticketNo', label: '工单编号', width: 150, fixed: false, summary: false, type: 'string' },
+    { field: 'title', label: '标题', width: 200, fixed: false, summary: false, type: 'string' },
+    { field: 'status', label: '状态', width: 100, fixed: false, summary: false, type: 'string' },
+    { field: 'priority', label: '优先级', width: 100, fixed: false, summary: false, type: 'string' },
+    { field: 'createBy', label: '创建人', width: 120, fixed: false, summary: false, type: 'string' },
+    { field: 'createTime', label: '创建时间', width: 180, fixed: false, summary: false, type: 'date' }
+  ];
+  
+  // 示例：更新排序数据
+  sortFields.value = [
+    { field: 'createTime', label: '创建时间', queryType: 'desc', defaultValue: '' }
+  ];
+}
 
 const getList = () => {
   loading.value = true;

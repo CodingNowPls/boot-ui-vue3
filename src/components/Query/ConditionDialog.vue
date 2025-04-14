@@ -123,12 +123,6 @@
               <el-table-column label="操作" width="180">
                 <template #default="{ $index }">
                   <div class="operation-buttons">
-                    <el-button link type="primary" size="small" :disabled="$index === 0" @click="moveColumnToTop($index)">
-                      <el-icon><Top /></el-icon>
-                    </el-button>
-                    <el-button link type="primary" size="small" :disabled="$index === columns.length - 1" @click="moveColumnDown($index)">
-                      <el-icon><ArrowDown /></el-icon>
-                    </el-button>
                     <el-button link type="danger" size="small" @click="removeColumn($index)">
                       <el-icon><Delete /></el-icon>
                     </el-button>
@@ -153,7 +147,7 @@
                   <el-icon><Bottom /></el-icon>
                 </el-button>
               </div>
-              <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加排序</el-button>
+              <el-button class="mt-2" size="small" type="primary" @click="addSort">添加排序</el-button>
             </div>
             <el-table
               :data="sortFields"
@@ -169,21 +163,17 @@
                   <el-input v-model="row.label" size="small" />
                 </template>
               </el-table-column>
-              <el-table-column label="查询方式">
+              <el-table-column label="排序方向">
                 <template #default="{ row }">
                   <el-select v-model="row.queryType" size="small" placeholder="请选择">
-                    <el-option v-for="item in queryTypes" :key="item.value" :label="item.label" :value="item.value" />
+                    <el-option label="升序" value="asc" />
+                    <el-option label="降序" value="desc" />
                   </el-select>
-                </template>
-              </el-table-column>
-              <el-table-column label="默认值">
-                <template #default="{ row }">
-                  <el-input v-model="row.defaultValue" size="small" />
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="80">
                 <template #default="{ $index }">
-                  <el-button link type="danger" icon="el-icon-delete" @click="removeCondition($index)" />
+                  <el-button link type="danger" icon="el-icon-delete" @click="removeSort($index)" />
                 </template>
               </el-table-column>
             </el-table>
@@ -216,11 +206,27 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { Top, ArrowUp, ArrowDown, Bottom, Delete } from '@element-plus/icons-vue'
 
 const props = defineProps({
-  modelValue: Boolean
+  modelValue: Boolean,
+  conditionsData: {
+    type: Array,
+    default: () => []
+  },
+  columnsData: {
+    type: Array,
+    default: () => []
+  },
+  sortData: {
+    type: Array,
+    default: () => []
+  },
+  templateData: {
+    type: Array,
+    default: () => []
+  }
 })
 const emit = defineEmits(['update:modelValue', 'confirm'])
 
@@ -230,10 +236,70 @@ watch(
     () => props.modelValue,
     (val) => {
       dialogVisible.value = val
+      if (val) {
+        refreshData()
+      }
     }
 )
 
 watch(dialogVisible, (val) => emit('update:modelValue', val))
+
+watch(
+  () => props.conditionsData,
+  (val) => {
+    if (val && val.length > 0) {
+      conditions.value = JSON.parse(JSON.stringify(val))
+    }
+  }
+)
+
+watch(
+  () => props.columnsData,
+  (val) => {
+    if (val && val.length > 0) {
+      columns.value = JSON.parse(JSON.stringify(val))
+    }
+  }
+)
+
+watch(
+  () => props.sortData,
+  (val) => {
+    if (val && val.length > 0) {
+      sortFields.value = JSON.parse(JSON.stringify(val))
+    }
+  }
+)
+
+watch(
+  () => props.templateData,
+  (val) => {
+    if (val && val.length > 0) {
+      treeData.value = JSON.parse(JSON.stringify(val))
+    }
+  }
+)
+
+const refreshData = () => {
+  if (props.conditionsData && props.conditionsData.length > 0) {
+    conditions.value = JSON.parse(JSON.stringify(props.conditionsData))
+  }
+
+  if (props.columnsData && props.columnsData.length > 0) {
+    columns.value = JSON.parse(JSON.stringify(props.columnsData))
+  }
+
+  if (props.sortData && props.sortData.length > 0) {
+    sortFields.value = JSON.parse(JSON.stringify(props.sortData))
+  }
+
+  if (props.templateData && props.templateData.length > 0) {
+    treeData.value = JSON.parse(JSON.stringify(props.templateData))
+  }
+
+  selectedTab.value = activeTab.value
+  selectedIndex.value = -1
+}
 
 const treeData = ref([
   { id: 1, label: '模板一' },
@@ -283,6 +349,7 @@ const handleConfirm = () => {
     name: templateName.value,
     conditions: conditions.value,
     columns: columns.value,
+    sortFields: sortFields.value
   })
   dialogVisible.value = false
 }
@@ -291,10 +358,8 @@ const handleCancel = () => {
   dialogVisible.value = false
 }
 
-// 添加排序数据
 const sortFields = ref([])
 
-// 选中行相关
 const selectedTab = ref('')
 const selectedIndex = ref(-1)
 const hasSelectedItem = computed(() => selectedIndex.value >= 0)
@@ -306,7 +371,6 @@ const isLastItem = computed(() => {
   return selectedIndex.value === currentData.length - 1
 })
 
-// 获取当前tab的数据
 const getCurrentData = () => {
   switch (selectedTab.value) {
     case 'condition': return conditions.value
@@ -316,14 +380,11 @@ const getCurrentData = () => {
   }
 }
 
-// 处理行点击
 const handleRowClick = (tab, row, rowIndex) => {
   selectedTab.value = tab
-  // 如果rowIndex直接提供了就用它，否则查找索引
   selectedIndex.value = rowIndex !== undefined ? rowIndex : getCurrentData().indexOf(row)
 }
 
-// 通用移动方法
 const moveUp = () => {
   if (selectedIndex.value <= 0) return
 
@@ -362,11 +423,18 @@ const moveToBottom = () => {
   selectedIndex.value = data.length - 1
 }
 
-// 当切换tab时重置选中状态
 watch(activeTab, () => {
   selectedTab.value = activeTab.value
   selectedIndex.value = -1
 })
+
+const addSort = () => {
+  sortFields.value.push({ field: '字段名', label: '', queryType: 'asc', defaultValue: '' })
+}
+
+const removeSort = (index) => {
+  sortFields.value.splice(index, 1)
+}
 </script>
 
 <style scoped lang="scss">
@@ -380,6 +448,7 @@ watch(activeTab, () => {
   &__body {
     display: flex;
     height: 420px;
+    overflow: hidden;
   }
 
   &__left {
@@ -398,7 +467,7 @@ watch(activeTab, () => {
     }
 
     &-buttons {
-      margin-top: auto; /* 将按钮推到底部 */
+      margin-top: auto;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -414,11 +483,23 @@ watch(activeTab, () => {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   &__tabs {
     flex: 1;
     overflow: auto;
+    position: relative;
+
+    :deep(.el-tabs__content) {
+      overflow: visible;
+      height: calc(100% - 40px);
+    }
+
+    :deep(.el-tab-pane) {
+      height: 100%;
+      overflow: auto;
+    }
 
     :deep(.el-table) {
       margin-top: 2px;
@@ -462,7 +543,7 @@ watch(activeTab, () => {
 
 .tab-actions {
   display: flex;
-  justify-content: space-between; /* 改为两端对齐 */
+  justify-content: space-between;
   align-items: center;
   margin: 0px 0;
 
@@ -492,5 +573,9 @@ watch(activeTab, () => {
     padding: 4px;
     margin: 0;
   }
+}
+
+:deep(.el-dialog__body) {
+  overflow: hidden;
 }
 </style>
