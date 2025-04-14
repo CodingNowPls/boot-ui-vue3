@@ -51,8 +51,8 @@
           </el-tab-pane>
 
           <el-tab-pane label="栏目" name="column">
-            <el-button class="mt-2" size="small" type="primary" @click="addCondition">添加栏目</el-button>
-            <el-table :data="conditions" border style="width: 100%">
+            <el-button class="mt-2" size="small" type="primary" @click="addColumn">添加栏目</el-button>
+            <el-table :data="columns" border style="width: 100%">
               <el-table-column label="序号" type="index" width="60" />
               <el-table-column label="显示项" prop="field" />
               <el-table-column label="显示名称">
@@ -60,21 +60,25 @@
                   <el-input v-model="row.label" size="small" />
                 </template>
               </el-table-column>
-              <el-table-column label="查询方式">
+              <el-table-column label="表格列宽">
                 <template #default="{ row }">
-                  <el-select v-model="row.queryType" size="small" placeholder="请选择">
-                    <el-option v-for="item in queryTypes" :key="item.value" :label="item.label" :value="item.value" />
-                  </el-select>
+                  <el-input-number v-model="row.width" size="small" :min="50" :max="500" :step="10" />
                 </template>
               </el-table-column>
-              <el-table-column label="默认值">
+              <el-table-column label="是否冻结">
                 <template #default="{ row }">
-                  <el-input v-model="row.defaultValue" size="small" />
+                  <el-checkbox v-model="row.fixed" />
+                </template>
+              </el-table-column>
+              <el-table-column label="是否合计">
+                <template #default="{ row }">
+                  <el-checkbox v-model="row.summary" v-if="row.type === 'number'" />
+                  <span v-else>-</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="80">
                 <template #default="{ $index }">
-                  <el-button link type="danger" icon="el-icon-delete" @click="removeCondition($index)" />
+                  <el-button link type="danger" icon="Delete" @click="removeColumn($index)" />
                 </template>
               </el-table-column>
             </el-table>
@@ -108,7 +112,7 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <el-tab-pane label="高级" name="advanced">高级内容占位</el-tab-pane>
+          <el-tab-pane label="高级" name="advanced"></el-tab-pane>
         </el-tabs>
 
         <!-- 右侧名称区域 -->
@@ -175,7 +179,17 @@ interface Condition {
   defaultValue: string
 }
 
+interface Column {
+  field: string
+  label: string
+  width: number
+  fixed: boolean
+  summary: boolean
+  type: string
+}
+
 const conditions = ref<Condition[]>([])
+const columns = ref<Column[]>([])
 
 const queryTypes = [
   { label: '模糊', value: 'like' },
@@ -191,12 +205,21 @@ const removeCondition = (index: number) => {
   conditions.value.splice(index, 1)
 }
 
+const addColumn = () => {
+  columns.value.push({ field: '字段名', label: '', width: 120, fixed: false, summary: false, type: 'string' })
+}
+
+const removeColumn = (index: number) => {
+  columns.value.splice(index, 1)
+}
+
 const templateName = ref('')
 
 const handleConfirm = () => {
   emit('confirm', {
     name: templateName.value,
     conditions: conditions.value,
+    columns: columns.value,
   })
   dialogVisible.value = false
 }
@@ -272,7 +295,7 @@ const handleCancel = () => {
     margin-top: auto;
     padding-top: 16px;
     border-top: 1px solid #ebeef5;
-    
+
     .center-form {
       display: flex;
       justify-content: center;
