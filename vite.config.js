@@ -53,6 +53,24 @@ export default defineConfig(({ mode, command }) => {
           }
         ]
       }
+    },
+    build: {
+      sourcemap: false,
+      outDir: 'src/main/resources/webjars',
+      emptyOutDir: true,
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
+          manualChunks: {
+            // 分包配置，配置完成自动按需加载
+            vue: ['vue', 'vue-router', 'pinia', 'element-plus'],
+            echarts: ['echarts'],
+          },
+        },
+      },
     }
   }
 })
