@@ -30,10 +30,10 @@ export default defineConfig(({ mode, command }) => {
       open: true,
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
-        '/dev-api': {
-          target: 'http://localhost:8081',
-          changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/dev-api/, '')
+        target: process.env.VITE_APP_API_BASE_URL,
+        changeOrigin: true,
+        pathRewrite: {
+          ['^' + process.env.VITE_APP_BASE_API]: ''
         }
       }
     },
@@ -57,20 +57,8 @@ export default defineConfig(({ mode, command }) => {
     build: {
       sourcemap: false,
       outDir: 'src/main/resources/webjars',
-      emptyOutDir: true,
-      chunkSizeWarningLimit: 2000,
-      rollupOptions: {
-        output: {
-          chunkFileNames: 'static/js/[name]-[hash].js',
-          entryFileNames: 'static/js/[name]-[hash].js',
-          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          manualChunks: {
-            // 分包配置，配置完成自动按需加载
-            vue: ['vue', 'vue-router', 'pinia', 'element-plus'],
-            echarts: ['echarts'],
-          },
-        },
-      },
+      emptyOutDir: false,
+      chunkSizeWarningLimit: 1500,
     }
   }
 })
