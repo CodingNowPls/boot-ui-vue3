@@ -29,13 +29,10 @@ export default defineConfig(({ mode, command }) => {
       host: true,
       open: true,
       proxy: {
-        // detail: https://cli.vuejs.org/config/#devserver-proxy
-        [process.env.VUE_APP_BASE_API]: {
-          target: process.env.VUE_APP_API_BASE_URL,
+        '/dev-api': {
+          target: 'http://localhost:8081',
           changeOrigin: true,
-          pathRewrite: {
-            ['^' + process.env.VUE_APP_BASE_API]: ''
-          }
+          rewrite: (p) => p.replace(/^\/dev-api/, '')
         }
       },
     },
