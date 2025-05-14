@@ -78,8 +78,14 @@ export default defineConfig(({ mode, command }) => {
         entryFileNames: 'js/[name].[hash].js',
         // 用于命名代码拆分时创建的共享块的输出命名
         chunkFileNames: 'js/[name].[hash].js',
-        // 用于输出静态资源的命名，[ext]表示文件扩展名
-        assetFileNames: '[ext]/[name].[hash].[ext]'
+        // 用于输出静态资源的命名，根据文件类型指定不同目录
+        assetFileNames: (assetInfo) => {
+          const extType = assetInfo.name.split('.').at(1);
+          if (/\.(css)$/i.test(assetInfo.name)) {
+            return 'css/[name].[hash].[ext]';
+          }
+          return `${extType || 'assets'}/[name].[hash].[ext]`;
+        }
       }
     },
       // 清空构建目录
