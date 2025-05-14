@@ -53,11 +53,47 @@ export default defineConfig(({ mode, command }) => {
         ]
       }
     },
-    build: {
-      sourcemap: false,
-      outDir: 'src/main/resources/webjars',
+    // 配置静态资源目录，将public下的资源复制到构建输出目录
+  publicDir: path.resolve(__dirname, 'public'),
+  build: {
+    // 指定输出路径（与vue2项目保持一致）
+    outDir: 'src/main/resources/webjars/static',
+    // 生成静态资源的存放路径（将所有资源放在static目录下）
+    assetsDir: '',
+    // 启用/禁用 CSS 代码拆分
+    cssCodeSplit: true,
+    // 构建后是否生成 source map 文件
+    sourcemap: false,
+    // 自定义底层的 Rollup 打包配置
+    rollupOptions: {
+      output: {
+        // 分解块，防止单个文件过大
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // 根据包名分割代码块
+            return id.toString().split('node_modules/')[1].split('/')[0].toString()
+          }
+        },
+        // 用于从入口点创建的块的打包输出格式
+        entryFileNames: 'js/[name].[hash].js',
+        // 用于命名代码拆分时创建的共享块的输出命名
+        chunkFileNames: 'js/[name].[hash].js',
+        // 用于输出静态资源的命名，[ext]表示文件扩展名
+        assetFileNames: '[ext]/[name].[hash].[ext]'
+      }
+    },
+      // 清空构建目录
       emptyOutDir: true,
+      // chunk 大小警告的限制（以 kbs 为单位）
       chunkSizeWarningLimit: 1500,
+      // 压缩大型输出文件可能会很慢，因此禁用该功能可能会提高大型项目的构建性能
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: VITE_APP_ENV === 'production', // 生产环境去除console
+          drop_debugger: VITE_APP_ENV === 'production' // 生产环境去除debugger
+        }
+      }
     }
   }
 })

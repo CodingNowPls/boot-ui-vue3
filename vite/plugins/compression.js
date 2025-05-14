@@ -10,7 +10,10 @@ export default function createCompression(env) {
             plugin.push(
                 compression({
                     ext: '.gz',
-                    deleteOriginFile: false
+                    algorithm: 'gzip',
+                    deleteOriginFile: false,
+                    threshold: 10240, // 只有大小大于该值的资源会被处理，单位为 bytes，默认为 0
+                    minRatio: 0.8 // 压缩率小于1才会被压缩
                 })
             )
         }
