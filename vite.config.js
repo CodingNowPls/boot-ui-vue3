@@ -57,8 +57,8 @@ export default defineConfig(({ mode, command }) => {
   publicDir: path.resolve(__dirname, 'public'),
   build: {
     // 指定输出路径（与vue2项目保持一致）
-    outDir: 'src/main/resources/webjars/static',
-    // 生成静态资源的存放路径（将所有资源放在static目录下）
+    outDir: 'src/main/resources/webjars',
+    // 生成静态资源的存放路径
     assetsDir: '',
     // 启用/禁用 CSS 代码拆分
     cssCodeSplit: true,
@@ -75,11 +75,11 @@ export default defineConfig(({ mode, command }) => {
           }
         },
         // 用于从入口点创建的块的打包输出格式
-        entryFileNames: 'js/[name].[hash].js',
+        entryFileNames: 'assets/js/[name].[hash].js',
         // 用于命名代码拆分时创建的共享块的输出命名
-        chunkFileNames: 'js/[name].[hash].js',
+        chunkFileNames: 'assets/js/[name].[hash].js',
         // 用于输出静态资源的命名，[ext]表示文件扩展名
-        assetFileNames: '[ext]/[name].[hash].[ext]'
+        assetFileNames: 'assets/[ext]/[name].[hash].[ext]'
       }
     },
       // 清空构建目录
