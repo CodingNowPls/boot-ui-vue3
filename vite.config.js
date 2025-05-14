@@ -29,13 +29,15 @@ export default defineConfig(({ mode, command }) => {
       host: true,
       open: true,
       proxy: {
-        // https://cn.vitejs.dev/config/#server-proxy
-        target: process.env.VITE_APP_API_BASE_URL,
-        changeOrigin: true,
-        pathRewrite: {
-          ['^' + process.env.VITE_APP_BASE_API]: ''
+        // detail: https://cli.vuejs.org/config/#devserver-proxy
+        [process.env.VUE_APP_BASE_API]: {
+          target: process.env.VUE_APP_API_BASE_URL,
+          changeOrigin: true,
+          pathRewrite: {
+            ['^' + process.env.VUE_APP_BASE_API]: ''
+          }
         }
-      }
+      },
     },
     //fix:error:stdin>:7356:1: warning: "@charset" must be the first rule in the file
     css: {
@@ -57,7 +59,7 @@ export default defineConfig(({ mode, command }) => {
     build: {
       sourcemap: false,
       outDir: 'src/main/resources/webjars',
-      emptyOutDir: false,
+      emptyOutDir: true,
       chunkSizeWarningLimit: 1500,
     }
   }
