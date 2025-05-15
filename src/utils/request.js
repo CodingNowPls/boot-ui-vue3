@@ -87,12 +87,14 @@ service.interceptors.response.use(res => {
         ElMessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' }).then(() => {
           isRelogin.show = false;
           useUserStore().logOut().then(() => {
-            let flag = import.meta.env.VITE_APP_ENV  === 'springbootJar';
-            if (flag) {
-              location.href = '/index.html';
-            }else {
-              location.href = '/index';
-            }
+            // let flag = import.meta.env.VITE_APP_ENV  === 'springbootJar';
+            //
+            // if (flag) {
+            //   location.href = '/index.html';
+            // }else {
+            //   location.href = '/index';
+            // }
+            location.href = '/index';
           })
       }).catch(() => {
         isRelogin.show = false;
