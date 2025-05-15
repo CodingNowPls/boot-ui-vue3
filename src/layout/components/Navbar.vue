@@ -78,13 +78,18 @@ function handleCommand(command) {
 }
 
 function logout() {
+  let flag = import.meta.env.VITE_APP_ENV  === 'springbootJar';
   ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
     userStore.logOut().then(() => {
-    location.href = '/index.html';
+      if (flag) {
+        location.href = '/index.html';
+      }else {
+        location.href = '/index';
+      }
   })
   }).catch(() => { });
 }

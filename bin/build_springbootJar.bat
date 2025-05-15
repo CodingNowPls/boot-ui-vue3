@@ -5,6 +5,7 @@ chcp 65001
 %~d0
 cd %~dp0
 
+cd ..
 
 
 if exist "src\main\resources\webjars" (
@@ -17,7 +18,7 @@ if exist "src\main\resources\webjars" (
 
 echo 执行打包web网页......
 
-call npm run build:prod
+call npm run build:springbootJar
 
 
 ::echo 拷贝dist文件到webjars中
@@ -31,5 +32,4 @@ call mvn package
 
 :: 暂时先注释
 ::call move.bat
-
 pause
