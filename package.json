@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "vite",
     "build:prod": "vite build --mode production",
+    "build:separation": "vite build --mode separation",
+    "build:springbootjar": "vite build --mode springbootjar",
     "build:test": "vite build --mode test",
     "preview": "vite preview"
   },
