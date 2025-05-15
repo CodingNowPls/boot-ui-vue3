@@ -10,7 +10,7 @@ export default defineConfig(({ mode, command }) => {
     // 部署生产环境和开发环境下的URL。
     // 默认情况下，vite 会假设你的应用是被部署在一个域名的根路径上
     // 例如 https://www.boot.vip/。如果应用被部署在一个子路径上，你就需要用这个选项指定这个子路径。例如，如果你的应用被部署在 https://www.boot.vip/admin/，则设置 baseUrl 为 /admin/。
-    base: VITE_APP_ENV === 'production' ? '/' : '/',
+    base: VITE_APP_ENV === 'production' ? '/static/' : '/',
     plugins: createVitePlugins(env, command === 'build'),
     resolve: {
       // https://cn.vitejs.dev/config/#resolve-alias
@@ -59,7 +59,7 @@ export default defineConfig(({ mode, command }) => {
     // 指定输出路径（与vue2项目保持一致）
     outDir: 'src/main/resources/webjars/static',
     // 生成静态资源的存放路径（将所有资源放在static目录下）
-    assetsDir: '',
+    assetsDir: 'static',
     // 启用/禁用 CSS 代码拆分
     cssCodeSplit: true,
     // 构建后是否生成 source map 文件
