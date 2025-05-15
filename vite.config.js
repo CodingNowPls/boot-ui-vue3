@@ -59,7 +59,7 @@ export default defineConfig(({ mode, command }) => {
     // 指定输出路径（与vue2项目保持一致）
     outDir: 'src/main/resources/webjars/static',
     // 生成静态资源的存放路径（将所有资源放在static目录下）
-    assetsDir: 'static',
+    assetsDir: '',
     // 启用/禁用 CSS 代码拆分
     cssCodeSplit: true,
     // 构建后是否生成 source map 文件
